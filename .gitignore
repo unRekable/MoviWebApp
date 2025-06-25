@@ -1,43 +1,40 @@
-# Python-Specific Files
+# Python-spezifische Dateien
 *.pyc
 __pycache__/
 .pytest_cache/
 
-# Virtual Environments
+# Virtuelle Umgebungen
 .venv/
 venv/
 env/
-movi/
+movi/ # Dies ist wichtig für dein aktuelles Setup
 
-# Databases
+# Datenbanken
 *.db
 *.sqlite
 *.sqlite3
-data/*.db
+data/*.db # Spezifischer für deine movies.db
 
-# Dependencies
+# Abhängigkeiten
 # pip-wheel-cache
 .pip/
 # poetry-cache
 .poetry/
 
-# IDE-Specific Files (for PyCharm)
+# IDE-spezifische Dateien (für PyCharm)
 .idea/
 *.iml
 
-# Log Files
+# Log-Dateien
 *.log
 
-# Temporary Files, Backups, etc.
+# Temporäre Dateien, Backups, etc.
 *~
 *.bak
 *.swp
 
-# macOS-Specific Files
+# macOS-spezifische Dateien
 .DS_Store
 
-# Windows-Specific Files
+# Windows-spezifische Dateien
 Thumbs.db
-
-# Environment Variables
-.env
