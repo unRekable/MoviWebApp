@@ -42,8 +42,8 @@ def init_db_command():
 
 @app.route('/')
 def home():
-    return "Welcome to MoviWeb App!"
-
+    users = data_manager.get_users()
+    return render_template('index.html', users=users)
 @app.route('/users', methods=['GET', 'POST'])
 def users():
     if request.method == 'GET':
@@ -51,21 +51,20 @@ def users():
         user_names = [user.name for user in users]
         return user_names
     elif request.method == 'POST':
-        user = request.form.get('user')
+        user = request.form.get('name')
         if user:
             data_manager.create_user(user)
-            return f"{user} created successfully."
+            return f"{user} created successfully.", 200
 
 @app.route('/users/<int:user_id>/movies', methods=['GET', 'POST'])
 def movies(user_id):
     if request.method == 'GET':
         movies = data_manager.get_movies(user_id)
-        if movies:
-            for movie in movies:
-                print(movie)
-            return "end."
-        else:
-            return "No movies found."
+        if not movies:
+            return "No movies found.", 404
+
+        return render_template('movies.html', movies=movies)
+
     elif request.method == 'POST':
         movie = request.form.get('movie')
         if movie:
@@ -81,19 +80,39 @@ def movies(user_id):
 
             if not existing_movie:
                 data_manager.add_movie(new_movie_data)
-                return f"Movie added: {new_movie_data.name} for user."
+                return f"Movie added: {new_movie_data.name} for user.", 200
             else:
                 return f"Movie '{new_movie_data.name}' already exists for user."
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['POST'])
 def movie_update(user_id, movie_id):
     if request.method == 'POST':
-        data_manager.update_movie(user_id, movie_id)
+        movie_title = request.form.get('title')
+
+        if not movie_title:
+            return "No movie title provided.", 404
+
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": f"User with ID {user_id} not found."}), 404
+
+        if data_manager.update_movie(movie_id, movie_title):
+            return f"Movie updated successfully", 200
+        else:
+            return jsonify({"error": f"Movie '{movie_title}' not found."}), 404
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['POST'])
 def movie_delete(user_id, movie_id):
     if request.method == 'POST':
-        data_manager.delete_movie(movie_id)
+
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": f"User with ID {user_id} not found."}), 404
+
+        if data_manager.delete_movie(movie_id):
+            return "Movie deleted successfully", 200
+        else:
+            return "Movie not found or could not be deleted.", 404
 
 
 if __name__ == '__main__':

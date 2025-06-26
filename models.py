@@ -9,7 +9,7 @@ class User(db.Model):
     name = db.Column(db.String, nullable=False)
 
     def __repr__(self):
-        return '<User %r>' % self.name
+        return self.name
 
 class Movie(db.Model):
     __tablename__ = 'movie'
