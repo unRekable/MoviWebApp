@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from models import db, User, Movie
 from data_manager import DataManager
+from api_handler import get_movie_by_title
 import os
 
 app = Flask(__name__)
@@ -50,17 +51,39 @@ def users():
         user_names = [user.name for user in users]
         return user_names
     elif request.method == 'POST':
-        return
+        user = request.form.get('user')
+        if user:
+            data_manager.create_user(user)
+            return f"{user} created successfully."
 
 @app.route('/users/<int:user_id>/movies', methods=['GET', 'POST'])
 def movies(user_id):
     if request.method == 'GET':
-        # When you click on a user name, the app retrieves that user’s list of favorite movies and displays it.
         movies = data_manager.get_movies(user_id)
-        return movies
+        if movies:
+            for movie in movies:
+                print(movie)
+            return "end."
+        else:
+            return "No movies found."
     elif request.method == 'POST':
-        # Add a new movie to a user’s list of favorite movies.
-        return
+        movie = request.form.get('movie')
+        if movie:
+            movies_dict = get_movie_by_title(movie)
+
+            title = movies_dict['Title']
+            year = movies_dict['Year']
+            director = movies_dict['Director']
+            poster_url = movies_dict['Poster']
+
+            new_movie_data = Movie(name=title, director=director, year=year, poster_url=poster_url, user_id=user_id)
+            existing_movie = Movie.query.filter_by(name=new_movie_data.name, user_id=user_id).first()
+
+            if not existing_movie:
+                data_manager.add_movie(new_movie_data)
+                return f"Movie added: {new_movie_data.name} for user."
+            else:
+                return f"Movie '{new_movie_data.name}' already exists for user."
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['POST'])
 def movie_update(user_id, movie_id):
