@@ -1,37 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
 
-
 <a href="/" class="back-link">&larr; Back to Users</a>
-{% for movie in movies %}
-<h1>Movies for {{ movie.user }}</h1>
+
+<h1>Movies for {{ user }}</h1>
+
 <div class="card-list">
-
-    <div class="card">
-
+    {% if not movies %}
+        <p>No movies found for this user.</p>
+    {% else %}
+        {% for movie in movies %}
+        <div class="card">
             <img src="{{ movie.poster_url }}" alt="Poster for {{ movie.name }}" class="movie-poster">
 
-        <form action="{{ url_for('movie_update', user_id=movie.user_id, movie_id=movie.id) }}" method="post" class="inline-form">
-            <input type="text" name="title" value="{{ movie.name }}" required>
-            <button type="submit" class="btn btn-small">Update</button>
-        </form>
+            <form action="{{ url_for('update_movie', user_id=movie.user_id, movie_id=movie.id) }}" method="post" class="inline-form">
+                <input type="text" name="title" value="{{ movie.name }}" required>
+                <button type="submit" class="btn btn-small">Update</button>
+            </form>
 
             <div><strong>Year:</strong> {{ movie.year }}</div>
-
-
             <div><strong>Director:</strong> {{ movie.director }}</div>
 
-        <form action="{{ url_for('movie_delete', user_id=movie.user_id, movie_id=movie.id) }}" method="post" class="inline-form">
-            <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Delete this movie?');">Delete</button>
-        </form>
-    </div>
-{% endfor %}
+            <form action="{{ url_for('delete_movie', user_id=movie.user_id, movie_id=movie.id) }}" method="post" class="inline-form">
+                <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Are you sure you want to delete this movie?');">Delete</button>
+            </form>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
 
 <div class="form-section">
     <h2>Add New Movie</h2>
-    <form action="/users/1/movies" method="post">
+    <form action="{{ url_for('movies', user_id=user.id) }}" method="post">
         <input type="text" name="title" placeholder="Movie title" required>
-
         <button type="submit" class="btn">Add Movie</button>
     </form>
 </div>

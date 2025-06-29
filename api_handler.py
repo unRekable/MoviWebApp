@@ -56,6 +56,3 @@ def get_movie_by_title(title: str) -> dict | None:
 
     except requests.exceptions.RequestException as e:
         raise requests.exceptions.RequestException(f"Network or HTTP error during API call: {e}") from e
-
-
-#print(get_movie_by_title("The Matrix"))
